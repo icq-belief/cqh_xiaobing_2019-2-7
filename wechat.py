@@ -140,49 +140,51 @@ def xbAnswer(msg):
 # 接收到小冰的公众号消息发来之后,转发给原用户
 @itchat.msg_register([itchat.content.TEXT,itchat.content.PICTURE,itchat.content.RECORDING], isMpChat=True)
 def map_reply(msg):
-    text = getText(msg)
-    global userId
-    if not replied.get(md5(userId+'_MSG')):
-        replied[md5(userId+'_MSG')] = 1
-        if msg['Type'] == 'Picture':
-            # msg['Text'](msg['FileName'])
-            msg['Text']('./images/' + msg['FileName'])
-            res_path = './images/' + msg['FileName']
-            itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.] ", userId)
-            itchat.send_image(res_path, userId)
-        elif msg['Type'] == 'Recording':
-            try:
-                wav2text.transcode('./records/' + msg['FileName'])
-                filename = msg['FileName'].replace('mp3', 'wav')
-                text = wav2text.wav_to_text('./records/' + filename)
-                itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.] " + text, userId)
-            except Exception as e:
-                print('转换期间出错,错误信息:%s.回复默认表情' % e)
+    if '小冰' in str(msg):
+        text = getText(msg)
+        print('正常:%s' % text)
+        global userId
+        if not replied.get(md5(userId+'_MSG')):
+            replied[md5(userId+'_MSG')] = 1
+            if msg['Type'] == 'Picture':
+                # msg['Text'](msg['FileName'])
+                msg['Text']('./images/' + msg['FileName'])
+                res_path = './images/' + msg['FileName']
+                itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.] ", userId)
+                itchat.send_image(res_path, userId)
+            elif msg['Type'] == 'Recording':
+                try:
+                    wav2text.transcode('./records/' + msg['FileName'])
+                    filename = msg['FileName'].replace('mp3', 'wav')
+                    text = wav2text.wav_to_text('./records/' + filename)
+                    itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.] " + text, userId)
+                except Exception as e:
+                    print('转换期间出错,错误信息:%s.回复默认表情' % e)
+            else:
+                itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.]  " + text, userId)
+        elif replied[md5(userId+'_MSG')] < MAX_LIMIT_MSG:
+            replied[md5(userId+'_MSG')] += 1
+            if msg['Type'] == 'Picture':
+                # msg['Text'](msg['FileName'])
+                msg['Text']('./images/' + msg['FileName'])
+                res_path = './images/' + msg['FileName']
+                itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.] ", userId)
+                itchat.send_image(res_path, userId)
+            elif msg['Type'] == 'Recording':
+                try:
+                    wav2text.transcode('./records/' + msg['FileName'])
+                    filename = msg['FileName'].replace('mp3', 'wav')
+                    text = wav2text.wav_to_text('./records/' + filename)
+                    itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.] " + text, userId)
+                except Exception as e:
+                    print('转换期间出错,错误信息:%s.回复默认表情' % e)
+            else:
+                itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.]  " + text, userId)
+        elif replied[md5(userId + '_MSG')] > MAX_LIMIT_MSG:
+            pass
         else:
-            itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.]  " + text, userId)
-    elif replied[md5(userId+'_MSG')] < MAX_LIMIT_MSG:
-        replied[md5(userId+'_MSG')] += 1
-        if msg['Type'] == 'Picture':
-            # msg['Text'](msg['FileName'])
-            msg['Text']('./images/' + msg['FileName'])
-            res_path = './images/' + msg['FileName']
-            itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.] ", userId)
-            itchat.send_image(res_path, userId)
-        elif msg['Type'] == 'Recording':
-            try:
-                wav2text.transcode('./records/' + msg['FileName'])
-                filename = msg['FileName'].replace('mp3', 'wav')
-                text = wav2text.wav_to_text('./records/' + filename)
-                itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.] " + text, userId)
-            except Exception as e:
-                print('转换期间出错,错误信息:%s.回复默认表情' % e)
-        else:
-            itchat.send_msg("[陈主人不在.暂由助理Neo开始回复你.有事请留言.主人看到后会及时回复你.]  " + text, userId)
-    elif replied[md5(userId + '_MSG')] > MAX_LIMIT_MSG:
-        pass
-    else:
-        replied[md5(userId + '_MSG')] += 1
-        itchat.send_msg(u"[陈主人不让我欺负你.So,have a nice day & See you!]", userId)
+            replied[md5(userId + '_MSG')] += 1
+            itchat.send_msg(u"[陈主人不让我欺负你.So,have a nice day & See you!]", userId)
         # itchat.send_msg('上图为微软小冰回答', userId)
     # else:
     #     if not replied.get(md5(userId + '_MSG_TEXT')):
